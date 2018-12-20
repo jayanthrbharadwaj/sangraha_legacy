@@ -39,5 +39,4 @@ jspm_packages
 .node_repl_history
 
 client/public
-db/matterwiki.sqlite
 tests/e2e/db/matterwiki.sqlite
