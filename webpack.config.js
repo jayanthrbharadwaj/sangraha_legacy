@@ -1,5 +1,5 @@
 
-/* 
+/*
  * TODO extract common chunks from dev and production configs 
  * and use something like webpack-merge to put them all together for the environment needed
  * Ref : http://survivejs.com/webpack/developing-with-webpack/splitting-configuration/
@@ -21,39 +21,39 @@ module.exports = {
 
     // polyfill for fetch API (Safari)
     // TODO a better way to handle this, maybe?
-    'whatwg-fetch', 
+    'whatwg-fetch',
 
     // entry point
     APP_DIR + '/index.jsx'
   ],
   output: {
-    path: BUILD_DIR,    
-    publicPath : '/public/',
+    path: BUILD_DIR,
+    publicPath: '/public/',
     filename: 'bundle.js'
   },
   // enabling sourcemaps for easier debugging
-  devtool : 'inline-source-map',
+  devtool: 'inline-source-map',
   // again for react HMR
-  devServer : {
-    hot : true,
-    inline : true,
-    contentBase : BUILD_DIR,
-    publicPath : '/public/'
+  devServer: {
+    hot: true,
+    inline: true,
+    contentBase: BUILD_DIR,
+    publicPath: '/public/'
   },
-  plugins : [
-      new webpack.HotModuleReplacementPlugin(),
-      new webpack.NamedModulesPlugin(),
-      new webpack.DefinePlugin({
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NamedModulesPlugin(),
+    new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('dev')
     })
   ],
-  module : {
-    loaders : [
+  module: {
+    loaders: [
       {
-        test : /\.jsx?/,
-        loader : 'babel-loader',
-        include : APP_DIR,
-        exclude : /node_modules/ ,
+        test: /\.jsx?/,
+        loader: 'babel-loader',
+        include: APP_DIR,
+        exclude: /node_modules/,
         query: {
           presets: ['es2015', 'react']
         }

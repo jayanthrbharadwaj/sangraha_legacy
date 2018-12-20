@@ -1,15 +1,13 @@
 Thanks to Matterwiki.
 Forked from
 http://github.com/matterwiki/matterwiki
-
 <img src="https://github.com/Matterwiki/matterwiki.github.io/blob/master/assets/logo-header.png?raw=true" />
-
 ## :warning: Warning
 Expect some things to be broken as we're actively working on a stable v0.3.0 release. Although the master branch is expected to work fine, we'd suggest you to wait until everything is completed. 
 
 If you'd like to help, drop in on any of the issues or pull requests, or email one of
 
-* na[dot]nishantarora[at]gmail[dot]com 
+* jayanth[dot]rbharadwaj[at]gmail[dot]com
 * hpkrishna07[at]gmail[dot]com
 
 You can also get a preview of the next version on the `v0.3.0`/`refactor` branches

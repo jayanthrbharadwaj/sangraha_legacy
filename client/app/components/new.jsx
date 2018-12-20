@@ -2,6 +2,7 @@ import React from 'react';
 import {hashHistory} from 'react-router';
 import Loader from './loader.jsx';
 import Alert from 'react-s-alert';
+import ReactQuill from 'react-quill'; // ES6
 
 class NewArticle extends React.Component {
   constructor(props) {
@@ -11,8 +12,8 @@ class NewArticle extends React.Component {
     this.state = {body: "", topics: [], error: "", loading: true};
   }
 
-  handleChange() {
-    this.setState({body: this.refs.body.value});
+  handleChange(html) {
+    this.setState({body: html});
   }
 
   componentDidMount() {
@@ -40,7 +41,7 @@ class NewArticle extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    var body = this.refs.body.value;
+    var body = this.body;
     var title = this.refs.title.value;
     var topicId = this.refs.topic.value;
     if(body && title && topicId) {
@@ -89,8 +90,10 @@ class NewArticle extends React.Component {
          <br/>
          <div className="row">
           <div className="col-md-12 new-article-form">
-                <trix-toolbar id="my_toolbar"></trix-toolbar>
-            <trix-editor toolbar="my_toolbar" input="my_input" placeholder="Start writing here...." class="input-body"></trix-editor>
+            <ReactQuill value={this.state.body}
+                        theme="snow"
+                        modules={NewArticle.modules}
+                        onChange={this.handleChange} />
             <input id="my_input" type="hidden" value="" ref="body" onChange={this.handleChange}/>
                <br/>
                <label>Choose topic</label>
@@ -110,5 +113,28 @@ class NewArticle extends React.Component {
     );
   }
 }
+
+NewArticle.modules = {
+  toolbar: [
+    [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
+    [{size: []}],
+    ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+    [{'list': 'ordered'}, {'list': 'bullet'},
+      {'indent': '-1'}, {'indent': '+1'}],
+    ['link', 'image', 'video'],
+    ['clean']
+  ],
+  clipboard: {
+    // toggle to add extra line breaks when pasting HTML:
+    matchVisual: false,
+  }
+}
+
+NewArticle.formats = [
+  'header', 'font', 'size',
+  'bold', 'italic', 'underline', 'strike', 'blockquote',
+  'list', 'bullet', 'indent',
+  'link', 'image', 'video'
+]
 
 export default NewArticle;
