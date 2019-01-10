@@ -1,13 +1,44 @@
 import React from 'react';
 import {Link, hashHistory} from 'react-router';
+import PropTypes from 'prop-types';
 import Loader from './loader.jsx';
+import { withStyles } from '@material-ui/core/styles';
 import Alert from 'react-s-alert';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import GoogleLogin from 'react-google-login';
+import cookie from "react-cookies";
+
+const styles = theme => ({
+  bullet: {
+    display: 'inline-block',
+    margin: '0 2px',
+    transform: 'scale(0.8)',
+  },
+  title: {
+    marginBottom: 16,
+    fontSize: 24,
+  },
+  pos: {
+    marginBottom: 12,
+    fontSize: 24,
+  },
+  button: {
+    margin: theme.spacing.unit,
+  },
+});
 
 class ViewArticle extends React.Component {
   constructor(props) {
     super(props);
     this.deleteArticle = this.deleteArticle.bind(this);
-    this.state = {article: {}, loading: true};
+    this.componentUnderDeeplink = this.componentUnderDeeplink.bind(this)
+
+    this.state = {article: {}, loading: true, approverWindow: false, approved:false, isUserLoggedOut:false, authorInfo: null};
+    console.log("is google loggedin "+cookie.load("isGoogleLoggedIn"))
   }
 
   componentDidUpdate() {
@@ -33,11 +64,101 @@ class ViewArticle extends React.Component {
       if(response.error.error)
         Alert.error(response.error.message);
       else {
-        that.setState({article: response.data})
+        cookie.remove('isGoogleLoggedIn')
+        if (cookie.load("isGoogleLoggedIn") === undefined) {
+          that.setState({isUserLoggedOut:true, article: response.data})
+        } else{
+          that.setState({article: response.data})
+          that.componentUnderDeeplink()
+        }
       }
       that.setState({loading: false})
     });
+  }
 
+  componentUnderDeeplink() {
+    var urlParams = new URLSearchParams(window.location.hash);
+    console.log(urlParams.get('author'));
+    var entries = urlParams.entries();
+    var authorValue
+    for(var pair of entries) {
+      console.log("pair"+pair[0]+" ", "value"+pair[1]);
+      if(pair[0].indexOf("author")) {
+        authorValue = pair[1]
+      }
+    }
+    if (authorValue != null && authorValue.trim().length > 0) {
+      authorValue = "rj12info@gmail.com"
+      this.findApprovals(authorValue).bind(this)
+    }
+  }
+
+  findApprovals(authorValue) {
+    //TODO get approval status based on url param
+    var urlParams = new URLSearchParams(window.location.search);
+    var token = authorValue
+    // token="raghu@gmail.com"
+    var myHeaders = new Headers({
+      "Content-Type": "application/x-www-form-urlencoded",
+      "referrerToken":authorValue
+    });
+    var tokenInit = {
+      method: 'GET',
+      headers:myHeaders
+    };
+
+    var that = this;
+    if (token != null) {
+      fetch('/api/approvals?articleId='+that.props.params.articleId, tokenInit)
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (response) {
+          if (response.error.error)
+            Alert.error(response.error.message);
+          else {
+            if(response.data !=null) {
+              if (response.data.approve_status == 1) {
+                that.setState({loading: false, approverWindow: false});
+                Alert.success("Article already approved");
+              } else if (response.data.approver_email == cookie.load('approver_email')) {
+                that.setState({loading: false, approverWindow: true});
+                this.setState({authorInfo:response.data})
+              } else {
+                that.setState({loading: false})
+              }
+            } else {
+              Alert.error("This wiki should not be viewed. It has not been Approved and published");
+            }
+          }
+        });
+    }
+  }
+
+  handleApproveArticle() {
+    this.setState({loading: false, approved: false});
+    var that = this
+    var myHeaders = new Headers({
+      "Content-Type": "application/x-www-form-urlencoded",
+    });
+    var myInit = {
+      method: 'PUT',
+      //TODO update author_email, author_name, article_id from login
+      headers:myHeaders,
+      body: "article_id="+this.props.params.articleId
+    };
+    fetch('/api/approvals/approved', myInit)
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (response) {
+        if (response.error.error)
+          Alert.error(response.error.message);
+        else {
+          that.setState({loading: false, approved: true, approverWindow:false});
+          Alert.error("Article Approved. Sent an email for your reference");
+        }
+      });
   }
 
   deleteArticle(e) {
@@ -66,28 +187,92 @@ class ViewArticle extends React.Component {
     });
   }
 
+  onSignIn(googleUser) {
+    var profile = googleUser.getBasicProfile();
+    console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+    console.log('Name: ' + profile.getName());
+    console.log('Image URL: ' + profile.getImageUrl());
+    console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+    cookie.save('accessToken',googleUser.accessToken,{path:'/'})
+    var user = {
+      name: profile.getName(),
+      email: profile.getEmail(),
+      google_profileImageUrl: profile.getImageUrl(),
+      google_id:profile.getId(),
+      google_access_token:googleUser.accessToken
+    };
+    this.addUser(user)
+  }
+
+  addUser(user) {
+    var myHeaders = new Headers({
+      "Content-Type": "application/x-www-form-urlencoded",
+      "x-access-token": window.localStorage.getItem('userToken')
+    });
+    var myInit = { method: 'POST',
+      headers: myHeaders,
+      body: "name="+user.name+"&email="+user.email+"&google_access_token="+user.google_access_token+"&google_id="+user.google_id+"&google_profileImageUrl"+user.google_profileImageUrl
+    };
+    var that = this;
+    fetch('/api/users/oauth',myInit)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(response) {
+        if(response.error.error)
+          Alert.error(response.error.message);
+        else {
+          that.setState({isUserLoggedOut:false})
+          Alert.success(response.data.name+'!! Welcome back to Madhwa Sangraha');
+          cookie.save("approver_email", response.data.email)
+          cookie.save("isGoogleLoggedIn", true)
+          that.componentUnderDeeplink()
+        }
+      });
+  }
+
+  onSignFailure(error) {
+    Alert.success('User has been updated');
+  }
+
   getRawMarkupBody() {
     return { __html: this.state.article.body };
   }
 
 
   render () {
+    const { classes } = this.props;
     if(this.state.loading)
       return <Loader/>;
     else if(this.state.article && this.state.article.topic && this.state.article.user) {
-      return(<div>
+      return(<div className="article-list">
         <div className="row">
           <div className="col-md-9">
-            <div className="article-heading">
-                <h1 className="single-article-title">{this.state.article.title}
-                </h1>
-                <div className="single-article-meta">
-                  Last updated on {new Date(this.state.article.updated_at.replace(' ','T')).toDateString()}
-              </div>
-            </div>
-            <div className="single-article-body"
-              dangerouslySetInnerHTML={this.getRawMarkupBody()}>
-            </div>
+            <Card className={classes.card}>
+              <CardContent>
+                <Typography className={classes.title} color="textSecondary">
+                  {this.state.article.title}
+                </Typography>
+                <Typography variant="headline" component="p">
+                  {this.state.article.title}
+                </Typography>
+                <Typography className={classes.pos} color="textSecondary" dangerouslySetInnerHTML={this.getRawMarkupBody()}>
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button size="small">Learn More</Button>
+              </CardActions>
+            </Card>
+            {this.state.approverWindow &&<Button fullWidth variant="contained" size="large" color="secondary"
+                                                 onClick={this.handleApproveArticle.bind(this)} className={classes.button}>
+              Approve Article
+            </Button>}
+            {this.state.isUserLoggedOut && <GoogleLogin
+              clientId="707850557465-1bgam53d1v1cer3ebrvj0gfv38dh61ms.apps.googleusercontent.com"
+              buttonText="Login"
+              onSuccess={this.onSignIn.bind(this)}
+              onFailure={this.onSignFailure.bind(this)}
+            />}
           </div>
           <div className="col-md-3 article-sidebar">
             <div className="sidebar-block">
@@ -133,10 +318,15 @@ class ViewArticle extends React.Component {
                   </div>
                 </div>
               </div>
+
           </div>
             );
     }
   }
 }
 
-export default ViewArticle;
+ViewArticle.propTypes = {
+  classes: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles)(ViewArticle);

@@ -54,6 +54,55 @@ module.exports = function(app) {
         });
       });
 
+  app.post('/users/oauth',function(req,res){
+    /*
+    This is a POST endpoint which takes the user name, email, password, and about to create
+    a new user profile.
+    It responds with the created user object in the data key.
+    the error key in the returning object is a boolen which is false if there is no error and true otherwise
+    */
+    Users.forge({email:req.body.email}).fetch().then(function (user) {
+      if (user == null) {
+        Users.forge()
+          .save({
+            name: req.body.name,
+            email: req.body.email,
+            google_access_token: req.body.google_access_token,
+            google_id: req.body.google_id,
+            google_profileImageUrl: req.body.google_profileImageUrl,
+          })
+          .then(function (user) {
+            res.json({
+              error: {
+                error: false,
+                message: ''
+              },
+              code: 'B131',
+              data: user.toJSON()
+            })
+          })
+          .catch(function (error) {
+            res.status(500).json({
+              error: {
+                error: true,
+                message: error.message
+              },
+              code: 'B132',
+              data: {}
+            })
+          });
+      } else {
+        res.json({
+          error: {
+            error: false,
+            message: ''
+          },
+          code: 'B131',
+          data: user.toJSON()
+        })
+      }
+    })
+  });
 
   app.get('/users',function(req,res){
     /*

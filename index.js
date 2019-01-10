@@ -44,112 +44,114 @@ require('./api/authentication')(app);
 // Importing the setup endpoint
 require('./api/setup')(app);
 
-apiRoutes.use(function(req, res, next) {
+// apiRoutes.use(function(req, res, next) {
 
   // check header or url parameters or post parameters for token
-  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+  // var token = req.body.token || req.query.token || req.headers['x-access-token'];
+  //
+  // // decode token
+  // if (token) {
+  //   // verifies secret and checks for expiration
+  //   jwt.verify(token, app.get('superSecret'), function(err, decoded) {
+  //     if (err) {
+  //       return res.json({
+  //         error: {
+  //           error: true,
+  //           message: 'Failed to authenticate token'
+  //         },
+  //         code: 'B101',
+  //         data: {
+  //
+  //         }
+  //       });
+  //     } else {
+  //       // if everything is good, save to request for use in other routes
+  //       req.decoded = decoded;
+  //       next();
+  //     }
+  //   });
+  //
+  // } else {
+  //   // if there is no token
+  //   // return an error
+  //   return res.status(403).json({
+  //     error: {
+  //       error: true,
+  //       message: 'No token provided'
+  //     },
+  //     code: 'B102',
+  //     data: {
+  //
+  //     }
+  //   });
+  //
+  // }
+// });
 
-  // decode token
-  if (token) {
-    // verifies secret and checks for expiration
-    jwt.verify(token, app.get('superSecret'), function(err, decoded) {
-      if (err) {
-        return res.json({
-          error: {
-            error: true,
-            message: 'Failed to authenticate token'
-          },
-          code: 'B101',
-          data: {
 
-          }
-        });
-      } else {
-        // if everything is good, save to request for use in other routes
-        req.decoded = decoded;
-        next();
-      }
-    });
-
-  } else {
-    // if there is no token
-    // return an error
-    return res.status(403).json({
-      error: {
-        error: true,
-        message: 'No token provided'
-      },
-      code: 'B102',
-      data: {
-
-      }
-    });
-
-  }
-});
-
-
-apiRoutesAdmin.use(function(req, res, next) {
-
-  // check header or url parameters or post parameters for token
-  var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
-  // decode token
-  if (token) {
-    // verifies secret and checks for expiration
-    jwt.verify(token, app.get('superSecret'), function(err, decoded) {
-      if (err) {
-        return res.json({
-          error: {
-            error: true,
-            message: 'Failed to authenticate token'
-          },
-          code: 'B101',
-          data: {
-
-          }
-        });
-      } else {
-        if(decoded.id == 1) {
-          // if everything is good, save to request for use in other routes
-          req.decoded = decoded;
-          next();
-        }
-        else {
-          return res.status(403).json({
-            error: {
-              error: true,
-              message: 'You are not authorized to perform this action'
-            },
-            code: 'BNOTADMIN',
-            data: {
-
-            }
-          });
-        }
-      }
-    });
-
-  } else {
-    // if there is no token
-    // return an error
-    return res.status(403).json({
-      error: {
-        error: true,
-        message: 'No token provided'
-      },
-      code: 'B102',
-      data: {
-
-      }
-    });
-
-  }
-});
+// apiRoutesAdmin.use(function(req, res, next) {
+//
+//   // check header or url parameters or post parameters for token
+//   var token = req.body.token || req.query.token || req.headers['x-access-token'];
+//
+//   // decode token
+//   if (token) {
+//     // verifies secret and checks for expiration
+//     jwt.verify(token, app.get('superSecret'), function(err, decoded) {
+//       if (err) {
+//         return res.json({
+//           error: {
+//             error: true,
+//             message: 'Failed to authenticate token'
+//           },
+//           code: 'B101',
+//           data: {
+//
+//           }
+//         });
+//       } else {
+//         if(decoded.id == 1) {
+//           // if everything is good, save to request for use in other routes
+//           req.decoded = decoded;
+//           next();
+//         }
+//         else {
+//           return res.status(403).json({
+//             error: {
+//               error: true,
+//               message: 'You are not authorized to perform this action'
+//             },
+//             code: 'BNOTADMIN',
+//             data: {
+//
+//             }
+//           });
+//         }
+//       }
+//     });
+//
+//   } else {
+//     // if there is no token
+//     // return an error
+//     return res.status(403).json({
+//       error: {
+//         error: true,
+//         message: 'No token provided'
+//       },
+//       code: 'B102',
+//       data: {
+//
+//       }
+//     });
+//
+//   }
+// });
 
 
 // Importing all endpoints for articles
 require('./api/articles')(apiRoutes);
+
+require('./api/approvals')(apiRoutes);
 
 // Importing all endpoints for topics
 require('./api/topics')(apiRoutes);

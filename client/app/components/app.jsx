@@ -1,81 +1,76 @@
 import React from 'react';
 import Login from './login.jsx';
+import BrowseTopics from './browse_topics.jsx';
+import Loader from './loader.jsx';
 import SearchForm from './searchform.jsx';
 import {Link, hashHistory} from 'react-router';
+import BrowseArticles from './browse_articles.jsx';
 import Alert from 'react-s-alert';
+import cookie from "react-cookies";
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.handleLogout = this.handleLogout.bind(this);
+    this.handleTopicClick = this.handleTopicClick.bind(this);
+    this.state = { topics: [],topicId:null, loading: true, isLogin: false};
   }
 
   componentWillMount() {
-    if(window.localStorage.getItem('userToken')==null) {
+    if(cookie.load('isGoogleLoggedIn')=== undefined || cookie.load('approver_email')=== undefined) {
+      this.setState({isLogin:true})
       hashHistory.push('login');
+    } else {
+      this.setState({isLogin:false})
     }
   }
 
-  handleLogout() {
-    window.localStorage.setItem('userToken','');
-    Alert.success("You've been successfully logged out");
+  componentDidMount() {
+    var myHeaders = new Headers({
+      "Content-Type": "application/x-www-form-urlencoded",
+      "x-access-token": window.localStorage.getItem('userToken')
+    });
+    var myInit = { method: 'GET',
+      headers: myHeaders,
+    };
+    var that = this;
+    fetch('/api/topics',myInit)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(response) {
+        if(response.error.error)
+          Alert.error(response.error.message);
+        else {
+          that.setState({topics: response.data})
+        }
+        that.setState({loading: false});
+      });
+  }
+
+  handleTopicClick(id) {
+    this.setState({topicId: id});
   }
 
   render () {
     var that = this;
-    return(
-      <div>
-      <nav className="navbar container-fluid navbar-default">
-          {(window.localStorage.getItem('userToken')) ?
-          <div className="navbar-header">
-            <button type="button" className="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-              <span className="sr-only">Toggle navigation</span>
-              <span className="icon-bar"></span>
-              <span className="icon-bar"></span>
-              <span className="icon-bar"></span>
-            </button>
-              <Link to='home' className="navbar-brand">
-                <img src="../assets/logo.png"></img>
-              </Link>
+    if (this.state.loading)
+      return <Loader/>;
+    else {
+      return (
+        <div>
+          {!this.state.isLogin && <BrowseTopics topicChange={this.handleTopicClick} />}
+          <div className="content container">
+            {that.props.children}
           </div>
-          :
-          <center>
-          <a className="navbar-login-logo" href="#">
-            <img src="../assets/logo.png"></img>
-          </a>
-        </center>
-        }
-          {(window.localStorage.getItem('userToken')) ?
-          <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul className="nav navbar-nav navbar-right">
-              {(window.localStorage.getItem('userId')==1) ?
-                <li><Link to="admin" className="">Admin
-                  </Link>
-                </li> :
-                ''
-              }
-             <li><Link to="article/new" className="">New Article
-              </Link>
-            </li>
-            <li>
-              <a href="" onClick={this.handleLogout} >Logout</a>
-            </li>
-            </ul>
-            <SearchForm />
+          <div className="footer center-align">
+            <p className="help-block">Powered by <a href="http://matterwiki.com">Matterwiki</a></p>
           </div>
-          : <div/>}
-      </nav>
-        <div className="content container">
-          {that.props.children}
-          </div>
-        <div className="footer center-align">
-          <p className="help-block">Powered by <a href="http://matterwiki.com">Matterwiki</a></p>
+          <Alert stack={{limit: 3}} position='bottom'/>
         </div>
-           <Alert stack={{limit: 3}} position='bottom'/>
-    </div>
 
-  );
+      );
+    }
   }
 }
 

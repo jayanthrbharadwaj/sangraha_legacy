@@ -13,16 +13,16 @@ import Admin from './components/admin.jsx';
 import Setup from './components/setup.jsx';
 import EditTopic from './components/edit_topics.jsx';
 import EditUser from './components/edit_users.jsx';
+import BrowseArticles from "./components/browse_articles.jsx";
 
 
 export default function () {
 	return (
 		<Route path="/" component={App}>
-		  <IndexRoute component={Login}/>
-		  <Route path="home" component={Home}/>
 		  <Route path="login" component={Login}/>
 		    <Route path="article/new" component={NewArticle}/>
 		    <Route path="article/edit/:articleId" component={EditArticle}/>
+		  <Route path="topic/:topicId" component={BrowseArticles}/>
 		  <Route path="article/history/:articleId" component={ArticleHistory}/>
 		  <Route path="article/:articleId" component={Article}/>
 		  <Route path="admin" component={Admin}/>

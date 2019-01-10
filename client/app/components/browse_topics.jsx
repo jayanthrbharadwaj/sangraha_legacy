@@ -1,68 +1,123 @@
 import React from 'react';
 import Loader from './loader.jsx';
-import {hashHistory} from 'react-router';
+import SearchForm from './searchform.jsx';
+import {Link, hashHistory} from 'react-router';
 import Alert from 'react-s-alert';
+import cookie from "react-cookies";
 
 class BrowseTopics extends React.Component {
   constructor(props) {
     super(props);
     this.topicSelect = this.topicSelect.bind(this);
-    this.state = { topics: [], loading: true};
+    this.handleLogout = this.handleLogout.bind(this);
+    this.state = {topics: [], loading: true};
   }
 
   componentDidMount() {
     var myHeaders = new Headers({
-        "Content-Type": "application/x-www-form-urlencoded",
-        "x-access-token": window.localStorage.getItem('userToken')
+      "Content-Type": "application/x-www-form-urlencoded",
+      "x-access-token": window.localStorage.getItem('userToken')
     });
-    var myInit = { method: 'GET',
-               headers: myHeaders,
-               };
+    var myInit = {
+      method: 'GET',
+      headers: myHeaders,
+    };
     var that = this;
-    fetch('/api/topics',myInit)
-    .then(function(response) {
-      return response.json();
-    })
-    .then(function(response) {
-      if(response.error.error)
-        Alert.error(response.error.message);
-      else {
-        that.setState({topics: response.data})
-      }
-    that.setState({loading: false});
-    });
+    fetch('/api/topics', myInit)
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (response) {
+        if (response.error.error)
+          Alert.error(response.error.message);
+        else {
+          console.log("topics " + JSON.stringify(response.data))
+          that.setState({topics: response.data})
+        }
+        that.setState({loading: false});
+      });
   }
 
-  topicSelect(id,e) {
+  topicSelect(id, e) {
     e.preventDefault();
     this.props.topicChange(id)
   }
 
+  handleLogout() {
+    cookie.remove('isGoogleLoggedIn')
+    cookie.remove('approver_email')
+    hashHistory.push("/home")
+    const auth2 = gapi.auth2.getAuthInstance()
+    if (auth2 != null) {
+      auth2.signOut().then(this.handleGoogleLogout)
+    }
 
-  render () {
-    if(this.state.loading)
+  }
+
+  handleGoogleLogout() {
+    window.localStorage.setItem('userToken', '');
+    hashHistory.push("/login")
+    Alert.success("You've been successfully logged out");
+  }
+
+  render() {
+    if (this.state.loading)
       return <Loader/>;
-    if(this.state.topics.length<1) {
+    if (this.state.topics.length < 1) {
       return <p className="help-block center-align">There are no topics created yet</p>;
     }
     else {
-      return(
-        <div className="custom-collapse">
-          <div className="visible-xs">
-        <button className="collapse-toggle btn btn-default" type="button" data-toggle="collapse" data-parent="custom-collapse" data-target="#side-menu-collapse">
-          View Topics
-         </button>
-        <br/>
-        <br/>
-        </div>
-        <div className="list-group collapse" id="side-menu-collapse">
-            {this.state.topics.map(topic => (
-              <a key={topic.id} href="#" className="list-group-item dropdown-toggle" onClick={(e) => this.topicSelect(topic.id,e)}>
-                <h4 className="list-group-item-heading">{topic.name}</h4>
-                <p className="list-group-item-text">{topic.description}</p>
+      return (
+        <nav className="navbar container-fluid navbar-default">
+
+          {(window.localStorage.getItem('userToken')) ?
+            <div className="navbar-header">
+              <button type="button" className="navbar-toggle collapsed" data-toggle="collapse"
+                      data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span className="sr-only">Toggle navigation</span>
+                <span className="icon-bar"></span>
+                <span className="icon-bar"></span>
+                <span className="icon-bar"></span>
+              </button>
+              <Link to='home' className="navbar-brand">
+                <img src="../assets/logo.png"></img>
+              </Link>
+            </div>
+            :
+            <center>
+              <a className="navbar-login-logo" href="#">
+                <img src="../assets/logo.png"></img>
               </a>
-          ))}</div>
-      </div>);
+            </center>
+          }
+
+            <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+              <ul className="nav navbar-nav navbar-right">
+                {cookie.load("isGoogleLoggedIn") !== undefined &&cookie.load('approver_email') === 'rj12info@gmail.com'&&
+                  <li><Link to="admin" className="">Admin
+                  </Link>
+                  </li>
+                }
+                <li><Link to="article/new" className="">New Article
+                </Link>
+                </li>
+              </ul>
+              <SearchForm/>
+            </div>
+          <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul className="nav navbar-nav navbar-left">
+              {this.state.topics.map(topic => (
+                <li data-toggle="tooltip" data-placement="bottom" title={topic.description}><Link
+                  to={"topic/" + topic.id} className=""><a href="#" className="list-group-item dropdown-toggle">
+                  <h4 className="list-group-item-heading">{topic.name}</h4></a></Link>
+                </li>
+              ))}
+              <li>
+                <a href="" onClick={this.handleLogout}>Logout</a>
+              </li>
+            </ul>
+          </div>
+        </nav>);
     }
   }
 }

@@ -45,10 +45,10 @@ class BrowseArticles extends React.Component {
                };
     var that = this;
     var url = '/api/articles';
-    if(nextProps.topicId==null && this.props.topicId==null)
+    if(nextProps.params.topicId==null && this.props.params.topicId==null)
       var url = '/api/articles';
     else
-      var url = '/api/topic/'+nextProps.topicId+'/articles';
+      var url = '/api/topic/'+nextProps.params.topicId+'/articles';
     fetch(url,myInit)
     .then(function(response) {
       return response.json();
