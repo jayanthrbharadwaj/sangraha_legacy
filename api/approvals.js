@@ -15,20 +15,7 @@ var fs = require('fs');
 var path = require('path');
 var Approvals = require('../models/approval.js');
 var nodemailer = require('nodemailer');
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'rj12info@gmail.com',
-    pass: 'bertyui1234'
-  }
-});
 
-var mailOptions = {
-  from: 'rj12info@gmail.com',
-  to: 'jayforum87@gmail.com',
-  subject: 'Sending Email using Node.js',
-  html: 'Madhwa Sangraha Wiki. View your article!'
-};
 
 
 var helper = require('sendgrid').mail;
@@ -134,7 +121,8 @@ module.exports = function (app) {
                 "approve_status": 1
               })
               .then(function (saved) {
-                sendEmail(saved.author_email)
+                sendEmailToAuthor(saved, 'approved_author.html','Your article is approved')
+                sendEmailToApprover(saved, 'approved_approver.html', 'You just Approved an article')
                 res.json({
                   error: {
                     error: false,
@@ -156,39 +144,6 @@ module.exports = function (app) {
               });
             });
 
-          function sendEmail(emailId) {
-            mailOptions.to = [req.body.id, "jayforum87@gmail.com"]
-            var jsonPath = path.join(__dirname, '..', 'mailers', 'savearticle.html');
-            fs.readFile(jsonPath, 'utf8', function (err, html) {
-              if (err) {
-                console.log(err);
-              } else {
-                html = html.replace("[[${recipient}]]", emailId)
-                html = html.replace("[[${articleUrl}]]", "http://localhost:5000/#/article/new?author=" + hash)
-                mailOptions.html = html
-                transporter.sendMail(mailOptions, function (error, info) {
-                  if (error) {
-                    console.log(error);
-                  } else {
-                    console.log('Email sent: ' + info.response);
-                  }
-                });
-
-              }
-            });
-
-            var request = sg.emptyRequest({
-              method: 'POST',
-              path: '/v3/mail/send',
-              body: mail.toJSON(),
-            });
-
-            sg.API(request, function (error, response) {
-              console.log(response.statusCode);
-              console.log(response.body);
-              console.log(response.headers);
-            });
-          }
         })
     })
       .catch(function (error) {
@@ -203,6 +158,104 @@ module.exports = function (app) {
       });
   });
 
+  function sendEmailToApprover(saved, filename, subject) {
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'rj12info@gmail.com',
+        pass: 'bertyui1234'
+      }
+    });
+    var mailOptions = {
+      from: 'rj12info@gmail.com',
+      to: 'jayforum87@gmail.com',
+      subject: 'Sending Email using Node.js',
+      html: 'Madhwa Sangraha Wiki. View your article!'
+    };
+    mailOptions.subject = subject
+    mailOptions.to = [saved.attributes.approver_email]
+    var jsonPath = path.join(__dirname, '..', 'mailers', filename);
+    fs.readFile(jsonPath, 'utf8', function (err, html) {
+      if (err) {
+        console.log(err);
+      } else {
+        html = html.replace("[[${author}]]", saved.attributes.author_name)
+        html = html.replace("[[${recipient}]]", saved.attributes.approver_name)
+        html = html.replace("[[${articleUrl}]]", "https://sangraha.herokuapp.com//#/article/"+saved.attributes.article_id+"?author=" + saved.attributes.approver_url_hash)
+        mailOptions.html = html
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+          }
+        });
+
+      }
+    });
+
+    var request = sg.emptyRequest({
+      method: 'POST',
+      path: '/v3/mail/send',
+      body: mail.toJSON(),
+    });
+
+    sg.API(request, function (error, response) {
+      console.log(response.statusCode);
+      console.log(response.body);
+      console.log(response.headers);
+    });
+  }
+
+  function sendEmailToAuthor(saved, filename, subject) {
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: 'rj12info@gmail.com',
+        pass: 'bertyui1234'
+      }
+    });
+    var mailOptions = {
+      from: 'rj12info@gmail.com',
+      to: 'jayforum87@gmail.com',
+      subject: 'Sending Email using Node.js',
+      html: 'Madhwa Sangraha Wiki. View your article!'
+    };
+    mailOptions.subject = subject
+    mailOptions.to = [saved.attributes.author_email]
+    var jsonPath = path.join(__dirname, '..', 'mailers', filename);
+    fs.readFile(jsonPath, 'utf8', function (err, html) {
+      if (err) {
+        console.log(err);
+      } else {
+        html = html.replace("[[${approver}]]", saved.attributes.approver_name)
+        html = html.replace("[[${recipient}]]", saved.attributes.author_name)
+        html = html.replace("[[${articleUrl}]]", "https://sangraha.herokuapp.com/#/article/new?author=" + saved.attributes.author_url_hash)
+        mailOptions.html = html
+        transporter.sendMail(mailOptions, function (error, info) {
+          if (error) {
+            console.log(error);
+          } else {
+            console.log('Email sent: ' + info.response);
+          }
+        });
+
+      }
+    });
+
+    var request = sg.emptyRequest({
+      method: 'POST',
+      path: '/v3/mail/send',
+      body: mail.toJSON(),
+    });
+
+    sg.API(request, function (error, response) {
+      console.log(response.statusCode);
+      console.log(response.body);
+      console.log(response.headers);
+    });
+  }
+
 
   app.put('/approvals', function (req, res) {
     /*
@@ -212,14 +265,23 @@ module.exports = function (app) {
 
     TODO: Add updates only for columns that are in the request body. Handle exceptions.
     */
-    var hash = crypto.createHash('md5').update(req.body.id).digest('hex');
-    Approvals.where('approver_email', req.body.id).fetch().then(function (approval) {
-      approval
-        .save({
-          "approver_email": hash
-        })
-        .then(function (saved) {
-          sendEmail(saved.author_email)
+    var authorHash = crypto.createHash('md5').update(req.body.author_email+req.body.article_id).digest('hex');
+    var approverrHash = crypto.createHash('md5').update(req.body.approver_email+req.body.article_id).digest('hex');
+    Approvals.where({'author_email': req.body.author_email, 'article_id':req.body.article_id}).fetch().then(function (approval) {
+      if (approval == null) {
+        Approvals.forge().save({
+          author_id: req.body.user_id,
+          author_email: req.body.author_email,
+          author_name: req.body.author_name,
+          article_id: req.body.article_id,
+          approver_id: req.body.approver_id,
+          approver_email: req.body.approver_email,
+          approver_name: req.body.approver_name,
+          author_url_hash: authorHash,
+          approver_url_hash:approverrHash
+        }).then(function (saved) {
+          sendEmailToAuthor(saved, 'request_by_author.html', "Your article has a pending review from "+saved.attributes.approver_name)
+          sendEmailToApprover(saved, 'request_to_approver.html', saved.attributes.author_name+" is requesting your review")
           res.json({
             error: {
               error: false,
@@ -229,6 +291,27 @@ module.exports = function (app) {
             data: saved
           });
         })
+      } else {
+        approval
+          .save({
+            author_url_hash: authorHash,
+            approver_url_hash: approverrHash,
+            approver_email: req.body.approver_email,
+            approver_name: req.body.approver_name
+          })
+          .then(function (saved) {
+            sendEmailToAuthor(saved, 'request_by_author.html', "Your article has a pending review from "+saved.attributes.approver_name)
+            sendEmailToApprover(saved, 'request_to_approver.html', saved.attributes.author_name+" is requesting your review")
+            res.json({
+              error: {
+                error: false,
+                message: ''
+              },
+              code: 'B107',
+              data: saved
+            });
+          })
+      }
     })
       .catch(function (error) {
         res.status(500).json({
@@ -241,39 +324,6 @@ module.exports = function (app) {
         });
       });
 
-    function sendEmail(emailId) {
-      mailOptions.to = [req.body.id, "jayforum87@gmail.com"]
-      var jsonPath = path.join(__dirname, '..', 'mailers', 'savearticle.html');
-      fs.readFile(jsonPath, 'utf8', function (err, html) {
-        if (err) {
-          console.log(err);
-        } else {
-          html = html.replace("[[${recipient}]]", emailId)
-          html = html.replace("[[${articleUrl}]]", "http://localhost:5000/#/article/new?author=" + hash)
-          mailOptions.html = html
-          transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-              console.log(error);
-            } else {
-              console.log('Email sent: ' + info.response);
-            }
-          });
-
-        }
-      });
-
-      var request = sg.emptyRequest({
-        method: 'POST',
-        path: '/v3/mail/send',
-        body: mail.toJSON(),
-      });
-
-      sg.API(request, function (error, response) {
-        console.log(response.statusCode);
-        console.log(response.body);
-        console.log(response.headers);
-      });
-    }
   });
 
 
@@ -299,7 +349,7 @@ module.exports = function (app) {
           approver_name: req.body.approver_name,
           author_url_hash: hash
         }).then(function (saved) {
-          sendEmail(saved.author_email)
+          sendEmailToAuthorOnArticleSave(saved)
           res.json({
             error: {
               error: false,
@@ -315,7 +365,7 @@ module.exports = function (app) {
             "author_url_hash": hash
           })
           .then(function (saved) {
-            sendEmail(saved.author_email)
+            sendEmailToAuthorOnArticleSave(saved)
             res.json({
               error: {
                 error: false,
@@ -338,16 +388,17 @@ module.exports = function (app) {
         });
       });
 
-    function sendEmail(emailId) {
+    function sendEmailToAuthorOnArticleSave(saved) {
       //TODO send email to correct recipients
-      mailOptions.to = [req.body.id, "jayforum87@gmail.com"]
+      mailOptions.subject = "Your just saved a new article"
+      mailOptions.to = [saved.attributes.author_email]
       var jsonPath = path.join(__dirname, '..', 'mailers', 'savearticle.html');
       fs.readFile(jsonPath, 'utf8', function (err, html) {
         if (err) {
           console.log(err);
         } else {
-          html = html.replace("[[${recipient}]]", emailId)
-          html = html.replace("[[${articleUrl}]]", "http://localhost:5000/#/article/new?author=" + hash)
+          html = html.replace("[[${recipient}]]", saved.attributes.author_name)
+          html = html.replace("[[${articleUrl}]]", "http://localhost:5000/#/article/"+saved.attributes.article_id+"?author=" + saved.attributes.author_hash_url)
           mailOptions.html = html
           transporter.sendMail(mailOptions, function (error, info) {
             if (error) {

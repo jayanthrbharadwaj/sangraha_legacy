@@ -17,7 +17,7 @@ class App extends React.Component {
   }
 
   componentWillMount() {
-    if(cookie.load('isGoogleLoggedIn')=== undefined || cookie.load('approver_email')=== undefined) {
+    if(cookie.load('google_email')=== undefined) {
       this.setState({isLogin:true})
       hashHistory.push('login');
     } else {

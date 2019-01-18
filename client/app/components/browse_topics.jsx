@@ -44,8 +44,9 @@ class BrowseTopics extends React.Component {
   }
 
   handleLogout() {
-    cookie.remove('isGoogleLoggedIn')
-    cookie.remove('approver_email')
+    cookie.remove('google_email')
+    cookie.remove('google_name')
+    cookie.remove('user_id')
     hashHistory.push("/home")
     const auth2 = gapi.auth2.getAuthInstance()
     if (auth2 != null) {
@@ -93,7 +94,7 @@ class BrowseTopics extends React.Component {
 
             <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <ul className="nav navbar-nav navbar-right">
-                {cookie.load("isGoogleLoggedIn") !== undefined &&cookie.load('approver_email') === 'rj12info@gmail.com'&&
+                {cookie.load('google_email') === 'rj12info@gmail.com'&&
                   <li><Link to="admin" className="">Admin
                   </Link>
                   </li>

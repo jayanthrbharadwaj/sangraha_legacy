@@ -5658,7 +5658,7 @@ button.close {
   clear: both;
 }
 .center-block {
-  display: block;
+  /* display: block; */
   margin-right: auto;
   margin-left: auto;
 }

@@ -54,8 +54,8 @@ class Login extends React.Component {
           Alert.error(response.error.message);
         else {
           Alert.success(response.data.name+'!! Welcome back to Madhwa Sangraha');
-          cookie.save("approver_email", response.data.email)
-          cookie.save("isGoogleLoggedIn", true)
+          cookie.save("google_email", response.data.email)
+          cookie.save("google_name", response.data.name)
           cookie.save("user_id", response.data.id)
           browserHistory.push('/#/');
           location.reload()
