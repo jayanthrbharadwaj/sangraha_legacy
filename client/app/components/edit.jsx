@@ -434,7 +434,7 @@ class EditArticle extends React.Component {
                         <h5 onClick={this.handleTransliterateRefresh.bind(this)}>type english + spacebar ಇಂಗ್ಲೀಷ್ not showing? <u>Refresh browser</u></h5>
                       </div>
                       <div className="center-block">
-                        <textarea ref="transliterateTextarea" onChange={this.handleTransliterate.bind(this)} id="transliterateTextarea" style={{width:'1000px',height:'300px'}}></textarea>
+                        <textarea ref="transliterateTextareaEdit" onChange={this.handleTransliterate.bind(this)} id="transliterateTextarea" style={{width:'1000px',height:'300px'}}></textarea>
                       </div>
                       <br/>
                       <br/>
