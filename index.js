@@ -15,6 +15,7 @@ var apiRoutes = express.Router();
 var apiRoutesAdmin = express.Router();
 var jwt = require('jsonwebtoken');
 var misc = require('./misc.js');
+const path = require('path');
 var config = require('./config'); //config file in the app directory which contains the JWT key
 
 process.env.PORT = process.env.PORT || 5000;
@@ -38,6 +39,10 @@ app.get('/api',function(req,res){
   res.send("Hey! You're looking at the matterwiki API");
 });
 
+app.get('/tr',function(req,res){
+  // this is just a sample endpoint I build to see if things are working
+  res.sendFile(path.join(__dirname, 'transliterate.html'));
+});
 // Importing all endpoints for authentication
 require('./api/authentication')(app);
 
