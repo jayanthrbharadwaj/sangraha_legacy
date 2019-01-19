@@ -33,7 +33,7 @@ class Login extends React.Component {
   }
 
   onSignFailure(error) {
-
+    Alert.success("Unable to login. Please try again later");
   }
 
   addUser(user) {
