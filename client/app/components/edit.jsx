@@ -9,7 +9,9 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import {withStyles} from '@material-ui/core/styles';
-import ReactQuill from 'react-quill'; // ES6
+import ReactQuill,{ Quill }  from 'react-quill'; // ES6
+import { ImageUpload }  from '@rj12info/quillimageupload';
+Quill.register('modules/imageUpload', ImageUpload);
 
 import Loader from './loader.jsx';
 import cookie from "react-cookies";

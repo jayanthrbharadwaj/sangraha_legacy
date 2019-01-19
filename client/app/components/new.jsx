@@ -7,7 +7,7 @@ import Button from '@material-ui/core/Button';
 import {withStyles} from '@material-ui/core/styles';
 import cookie from "react-cookies";
 import ReactQuill,{ Quill }  from 'react-quill'; // ES6
-import { ImageUpload }  from 'quill-image-upload';
+import { ImageUpload }  from '@rj12info/quillimageupload';
 Quill.register('modules/imageUpload', ImageUpload);
 
 
