@@ -267,7 +267,7 @@ class EditArticle extends React.Component {
   }
 
   handleTransliterate(value) {
-    this.setState({body: this.refs.transliterateTextarea.value});
+    this.setState({body: this.refs.transliterateTextareaEdit.value});
   }
 
   handleTransliterateRefresh(value) {
@@ -434,7 +434,7 @@ class EditArticle extends React.Component {
                         <h5 onClick={this.handleTransliterateRefresh.bind(this)}>type english + spacebar ಇಂಗ್ಲೀಷ್ not showing? <u>Refresh browser</u></h5>
                       </div>
                       <div className="center-block">
-                        <textarea ref="transliterateTextareaEdit" onChange={this.handleTransliterate.bind(this)} id="transliterateTextarea" style={{width:'1000px',height:'300px'}}></textarea>
+                        <textarea ref="transliterateTextareaEdit" onChange={this.handleTransliterate.bind(this)} id="transliterateTextareaEdit" style={{width:'1000px',height:'300px'}}></textarea>
                       </div>
                       <br/>
                       <br/>
