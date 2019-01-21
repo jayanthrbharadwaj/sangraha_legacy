@@ -398,7 +398,7 @@ module.exports = function (app) {
           console.log(err);
         } else {
           html = html.replace("[[${recipient}]]", saved.attributes.author_name)
-          html = html.replace("[[${articleUrl}]]", "http://localhost:5000/#/article/"+saved.attributes.article_id+"?author=" + saved.attributes.author_hash_url)
+          html = html.replace("[[${articleUrl}]]", "http://sangraha.herokuapp.com/#/article/"+saved.attributes.article_id+"?author=" + saved.attributes.author_hash_url)
           mailOptions.html = html
           transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
