@@ -276,11 +276,8 @@ class ViewArticle extends React.Component {
                   <Button size="small">Learn More</Button>
                 </CardActions>
               </Card>
-              {this.state.approverWindow && <Button fullWidth variant="contained" size="large" color="secondary"
-                                                    onClick={this.handleApproveArticle.bind(this)}
-                                                    className={classes.button}>
-                Approve Article
-              </Button>}
+
+              {this.state.approverWindow && <button className="btn btn-default btn-block btn-lg" onClick={this.handleApproveArticle.bind(this)}>Approve Article</button>}
               {this.state.isUserLoggedOut && <GoogleLogin
                 clientId="707850557465-1bgam53d1v1cer3ebrvj0gfv38dh61ms.apps.googleusercontent.com"
                 buttonText="Login"

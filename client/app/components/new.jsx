@@ -170,7 +170,12 @@ class NewArticle extends React.Component {
   }
 
   handleKannadaClick() {
-    $('#myModal').modal('show');
+    pramukhIME.enable();
+    $('#myModalTransliterate').modal('show');
+    $('#myModalTransliterate').on('hidden.bs.modal', function () {
+      // do something…
+      pramukhIME.disable();
+    })
   }
 
   handleTransliterate(value) {
@@ -225,7 +230,7 @@ class NewArticle extends React.Component {
           </div>
           <br/>
 
-          <div className="modal modal-fullscreen fade" id="myModal" tabIndex="-1" role="dialog"
+          <div className="modal modal-fullscreen fade" id="myModalTransliterate" tabIndex="-1" role="dialog"
                aria-labelledby="myModalLabel">
             <div className="modal-dialog" role="document">
               <div className="modal-content">
@@ -243,7 +248,7 @@ class NewArticle extends React.Component {
                         <h5 onClick={this.handleTransliterateRefresh.bind(this)}>type english + spacebar ಇಂಗ್ಲೀಷ್ not showing? <u>Refresh browser</u></h5>
                       </div>
                       <div className="center-block">
-                        <textarea ref="transliterateTextarea" onChange={this.handleTransliterate.bind(this)} id="transliterateTextarea" style={{width:'1000px',height:'300px'}}></textarea>
+                        <textarea ref="transliterateTextarea" onChange={this.handleTransliterate.bind(this)} id="transliterateTextarea" style={{width:'1000px',height:'300px', fontSize: '20px'}}></textarea>
                       </div>
                         <br/>
                         <br/>

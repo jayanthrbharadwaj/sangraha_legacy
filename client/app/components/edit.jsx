@@ -263,7 +263,12 @@ class EditArticle extends React.Component {
 
 
   handleKannadaClick() {
+    pramukhIME.enable();
     $('#myModalTransliterate').modal('show');
+    $('#myModalTransliterate').on('hidden.bs.modal', function () {
+      // do something…
+      pramukhIME.disable();
+    })
   }
 
   handleTransliterate(value) {
