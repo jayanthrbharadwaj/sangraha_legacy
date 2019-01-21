@@ -3,6 +3,9 @@ Forked from
 http://github.com/matterwiki/matterwiki
 <img src="https://github.com/Matterwiki/matterwiki.github.io/blob/master/assets/logo-header.png?raw=true" />
 ## :warning: Warning
+
+[![Join the chat at https://gitter.im/sangrahatalk/community](https://badges.gitter.im/sangrahatalk/community.svg)](https://gitter.im/sangrahatalk/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Expect some things to be broken as we're actively working on a stable v0.3.0 release. Although the master branch is expected to work fine, we'd suggest you to wait until everything is completed. 
 
 If you'd like to help, drop in on any of the issues or pull requests, or email one of
