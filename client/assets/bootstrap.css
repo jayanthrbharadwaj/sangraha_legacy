@@ -297,6 +297,7 @@ textarea {
 a {
   color: #ff0066;
   text-decoration: none;
+  display: inline-block;
 }
 a:hover,
 a:focus {

@@ -149,6 +149,11 @@ class EditArticle extends React.Component {
     }
   }
 
+  componentWillMount() {
+    if(cookie.load('google_email') === undefined) {
+      hashHistory.push('login');
+    }
+  }
 
   componentDidMount() {
     var myHeaders = new Headers({

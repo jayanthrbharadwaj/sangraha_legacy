@@ -1,10 +1,7 @@
 import React from 'react';
-import Login from './login.jsx';
 import BrowseTopics from './browse_topics.jsx';
 import Loader from './loader.jsx';
-import SearchForm from './searchform.jsx';
-import {Link, hashHistory} from 'react-router';
-import BrowseArticles from './browse_articles.jsx';
+import {hashHistory} from 'react-router';
 import Alert from 'react-s-alert';
 import cookie from "react-cookies";
 
