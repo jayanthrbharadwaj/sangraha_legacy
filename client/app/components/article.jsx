@@ -11,7 +11,6 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import GoogleLogin from 'react-google-login';
 import cookie from "react-cookies";
-import ReactDisqusComments from 'react-disqus-comments';
 import Disqus from 'disqus-react';
 
 const styles = theme => ({
@@ -318,9 +317,9 @@ class ViewArticle extends React.Component {
             </div>
           </div>
 
-          <Disqus.CommentCount shortname={this.disqusShortname} config={this.disqusConfig}>
+          <Disqus.DiscussionEmbed shortname={this.disqusShortname} config={this.disqusConfig}>
             Comments
-          </Disqus.CommentCount>
+          </Disqus.DiscussionEmbed>
         </div>
       );
     }
