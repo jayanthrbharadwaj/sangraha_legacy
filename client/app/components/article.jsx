@@ -316,7 +316,7 @@ class ViewArticle extends React.Component {
               <button className="btn btn-default btn-block btn-lg" onClick={this.deleteArticle}>Delete</button>}
             </div>
           </div>
-
+          <div className="addthis_inline_share_toolbox"></div>
           <Disqus.DiscussionEmbed shortname={this.disqusShortname} config={this.disqusConfig}>
             Comments
           </Disqus.DiscussionEmbed>
