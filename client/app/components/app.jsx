@@ -14,12 +14,12 @@ class App extends React.Component {
   }
 
   componentWillMount() {
-    if(cookie.load('google_email')=== undefined) {
-      this.setState({isLogin:true})
-      hashHistory.push('login');
-    } else {
-      this.setState({isLogin:false})
-    }
+    // if(cookie.load('google_email')=== undefined) {
+    //   this.setState({isLogin:true})
+    //   hashHistory.push('login');
+    // } else {
+    //   this.setState({isLogin:false})
+    // }
   }
 
   componentDidMount() {
