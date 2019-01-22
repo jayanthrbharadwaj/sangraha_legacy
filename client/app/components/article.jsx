@@ -311,7 +311,7 @@ class ViewArticle extends React.Component {
 
           <ReactDisqusComments
             shortname="https-sangraha-herokuapp-com"
-            identifier={""+this.state.article.id}
+            identifier="https-sangraha-herokuapp-com"
             title={this.state.article.title}
             url={window.location.href}
             category_id="123456"
