@@ -12,6 +12,7 @@ import Typography from '@material-ui/core/Typography';
 import GoogleLogin from 'react-google-login';
 import cookie from "react-cookies";
 import ReactDisqusComments from 'react-disqus-comments';
+import Disqus from 'disqus-react';
 
 const styles = theme => ({
   bullet: {
@@ -46,6 +47,7 @@ class ViewArticle extends React.Component {
       isUserLoggedOut: false,
       authorInfo: null
     };
+
   }
 
   componentDidUpdate() {
@@ -82,6 +84,13 @@ class ViewArticle extends React.Component {
         }
         that.setState({loading: false})
       });
+
+    this.disqusShortname = 'https-sangraha-herokuapp-com';
+    this.disqusConfig = {
+      url: window.location.href,
+      identifier: this.props.params.articleId,
+      title: this.state.article.title,
+    };
   }
 
   componentUnderDeeplink() {
@@ -309,13 +318,9 @@ class ViewArticle extends React.Component {
             </div>
           </div>
 
-          <ReactDisqusComments
-            shortname="https-sangraha-herokuapp-com"
-            identifier="https-sangraha-herokuapp-com"
-            title={this.state.article.title}
-            url={window.location.href}
-            category_id="123456"
-            onNewComment={this.handleNewComment}/>
+          <Disqus.CommentCount shortname={this.disqusShortname} config={this.disqusConfig}>
+            Comments
+          </Disqus.CommentCount>
         </div>
       );
     }
