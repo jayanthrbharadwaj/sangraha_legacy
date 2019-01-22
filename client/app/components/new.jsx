@@ -179,7 +179,7 @@ class NewArticle extends React.Component {
   }
 
   handleTransliterate(value) {
-    this.setState({body: this.refs.transliterateTextarea.value});
+    this.setState({body: this.state.body.concat(this.refs.transliterateTextareaEdit.value)});
   }
 
   handleTransliterateRefresh(value) {

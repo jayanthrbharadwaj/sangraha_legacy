@@ -277,7 +277,7 @@ class EditArticle extends React.Component {
   }
 
   handleTransliterate(value) {
-    this.setState({body: this.refs.transliterateTextareaEdit.value});
+    this.setState({body: this.state.body.concat(this.refs.transliterateTextareaEdit.value)});
   }
 
   handleTransliterateRefresh(value) {
