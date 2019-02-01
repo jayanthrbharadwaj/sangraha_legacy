@@ -71,40 +71,19 @@ class BrowseTopics extends React.Component {
       return (
         <nav className="navbar container-fluid navbar-default">
 
-          {(window.localStorage.getItem('userToken')) ?
-            <div className="navbar-header">
-              <button type="button" className="navbar-toggle collapsed" data-toggle="collapse"
-                      data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                <span className="sr-only">Toggle navigation</span>
-                <span className="icon-bar"></span>
-                <span className="icon-bar"></span>
-                <span className="icon-bar"></span>
-              </button>
-              <Link to='home' className="navbar-brand">
-                <img src="../assets/logo.png"></img>
-              </Link>
-            </div>
-            :
-            <center>
-              <a className="navbar-login-logo" href="#">
-                <img src="../assets/logo.png"></img>
-              </a>
-            </center>
-          }
+          <div className="navbar-header">
 
-            <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-              <ul className="nav navbar-nav navbar-right">
-                {cookie.load('google_email') === 'rj12info@gmail.com'&&
-                  <li><Link to="admin" className="">Admin
-                  </Link>
-                  </li>
-                }
-                <li><Link to="article/new" className="">New Article
-                </Link>
-                </li>
-              </ul>
-              <SearchForm/>
-            </div>
+            <button type="button" className="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+              <span className="sr-only">Toggle navigation</span>
+              <span className="icon-bar"></span>
+              <span className="icon-bar"></span>
+              <span className="icon-bar"></span>
+            </button>
+            <Link to="/" className="navbar-brand">
+              <img src="../assets/logo.png"></img>
+            </Link>
+          </div>
           <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul className="nav navbar-nav navbar-left">
               {this.state.topics.map(topic => (
@@ -118,6 +97,7 @@ class BrowseTopics extends React.Component {
               </li>
             </ul>
           </div>
+
         </nav>);
     }
   }
