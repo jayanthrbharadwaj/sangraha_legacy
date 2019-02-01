@@ -1,6 +1,5 @@
 import React from 'react';
 import Loader from './loader.jsx';
-import SearchForm from './searchform.jsx';
 import {Link, hashHistory} from 'react-router';
 import Alert from 'react-s-alert';
 import cookie from "react-cookies";
@@ -84,7 +83,18 @@ class BrowseTopics extends React.Component {
               <img src="../assets/logo.png"></img>
             </Link>
           </div>
+
           <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul className="nav navbar-nav navbar-right">
+              {cookie.load('google_email') === 'rj12info@gmail.com'&&
+              <li><Link to="admin" className="">Admin
+              </Link>
+              </li>
+              }
+              <li className="lead"><Link to="article/new" className="">New Article
+              </Link>
+              </li>
+            </ul>
             <ul className="nav navbar-nav navbar-left">
               {this.state.topics.map(topic => (
                 <li data-toggle="tooltip" data-placement="bottom" title={topic.description}><Link
@@ -95,6 +105,7 @@ class BrowseTopics extends React.Component {
               <li>
                 <a href="" onClick={this.handleLogout}>Logout</a>
               </li>
+
             </ul>
           </div>
 
