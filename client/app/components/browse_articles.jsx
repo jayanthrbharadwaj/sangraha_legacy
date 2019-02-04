@@ -62,15 +62,14 @@ class BrowseArticles extends React.Component {
       that.setState({loading: false});
     });
   }
+
+
   render () {
-    if(this.state.loading)
-      return <Loader/>;
-    if(this.state.articles.length<1) {
-      return <p className="help-block center-align">There are no articles under this topic</p>;
-    }
-    else {
-      return(<div>
-            <div className="article-list">
+    return(
+    <div className="article-list" id = {"topic/"+this.props.params.topicId}>
+      {this.state.loading && <Loader/>}
+      {this.state.articles.length<1 &&  <p className="help-block center-align">There are no articles under this topic</p>}
+
             {this.state.articles.map(article => (
             <div key={article.id} className="article-item">
               <div className="article-item-title">
@@ -82,9 +81,9 @@ class BrowseArticles extends React.Component {
               <hr className="article-separator"></hr>
             </div>
 
-          ))}</div>
-      </div>);
-    }
+          ))}
+      </div>
+    )
   }
 }
 

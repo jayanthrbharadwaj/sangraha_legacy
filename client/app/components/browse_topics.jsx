@@ -37,6 +37,11 @@ class BrowseTopics extends React.Component {
       });
   }
 
+//t = current time
+//b = start value
+//c = change in value
+//d = duration
+
   topicSelect(id, e) {
     e.preventDefault();
     this.props.topicChange(id)
@@ -98,15 +103,15 @@ class BrowseTopics extends React.Component {
             <ul className="nav navbar-nav navbar-left">
               {this.state.topics.map(topic => (
                 <li data-toggle="tooltip" data-placement="bottom" title={topic.description}><Link
-                  to={"topic/" + topic.id} className=""><a href="#" className="list-group-item dropdown-toggle">
+                  href={"topic/" + topic.id}><a href={topic/" + topic.id"} className="list-group-item dropdown-toggle">
                   <h4 className="list-group-item-heading">{topic.name}</h4></a></Link>
                 </li>
               ))}
               <li>
                 <a href="" onClick={this.handleLogout}>Logout</a>
               </li>
-
             </ul>
+            <hr className="article-separator"></hr>
           </div>
 
         </nav>);
