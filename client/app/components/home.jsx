@@ -7,7 +7,7 @@ class Home extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {topicId: '1', loading: true};
+    this.state = {topicId: '0', loading: true};
   }
 
 

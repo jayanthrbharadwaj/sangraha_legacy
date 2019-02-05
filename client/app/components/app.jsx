@@ -1,25 +1,24 @@
 import React from 'react';
 import BrowseTopics from './browse_topics.jsx';
 import Loader from './loader.jsx';
-import {hashHistory} from 'react-router';
 import Alert from 'react-s-alert';
 import cookie from "react-cookies";
+import {hashHistory} from 'react-router';
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.handleTopicClick = this.handleTopicClick.bind(this);
-    this.state = { topics: [],topicId:null, loading: true, isLogin: false};
+    this.state = { topics: [], loading: true, isLogin: false};
   }
 
   componentWillMount() {
-    // if(cookie.load('google_email')=== undefined) {
-    //   this.setState({isLogin:true})
-    //   hashHistory.push('login');
-    // } else {
-    //   this.setState({isLogin:false})
-    // }
+    if(cookie.load('google_email')=== undefined) {
+      this.setState({isLogin:true})
+      hashHistory.push('login');
+    } else {
+      this.setState({isLogin:false})
+    }
   }
 
   componentDidMount() {
@@ -45,10 +44,6 @@ class App extends React.Component {
       });
   }
 
-  handleTopicClick(id) {
-    this.setState({topicId: id});
-  }
-
   render () {
     var that = this;
     if (this.state.loading)
@@ -56,7 +51,7 @@ class App extends React.Component {
     else {
       return (
         <div>
-          {!this.state.isLogin && <BrowseTopics topicChange={this.handleTopicClick} />}
+          {!this.state.isLogin && <BrowseTopics/>}
           <div className="content container">
             {that.props.children}
           </div>

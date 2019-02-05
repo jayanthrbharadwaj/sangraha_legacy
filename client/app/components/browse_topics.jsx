@@ -7,7 +7,6 @@ import cookie from "react-cookies";
 class BrowseTopics extends React.Component {
   constructor(props) {
     super(props);
-    this.topicSelect = this.topicSelect.bind(this);
     this.handleLogout = this.handleLogout.bind(this);
     this.state = {topics: [], loading: true};
   }
@@ -41,11 +40,6 @@ class BrowseTopics extends React.Component {
 //b = start value
 //c = change in value
 //d = duration
-
-  topicSelect(id, e) {
-    e.preventDefault();
-    this.props.topicChange(id)
-  }
 
   handleLogout() {
     cookie.remove('google_email')
@@ -103,7 +97,7 @@ class BrowseTopics extends React.Component {
             <ul className="nav navbar-nav navbar-left">
               {this.state.topics.map(topic => (
                 <li data-toggle="tooltip" data-placement="bottom" title={topic.description}><Link
-                  href={"topic/" + topic.id}><a href={topic/" + topic.id"} className="list-group-item dropdown-toggle">
+                  to={"topic/" + topic.id} className=""><a href="#" className="list-group-item dropdown-toggle">
                   <h4 className="list-group-item-heading">{topic.name}</h4></a></Link>
                 </li>
               ))}
