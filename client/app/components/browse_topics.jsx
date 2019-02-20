@@ -3,43 +3,75 @@ import Loader from './loader.jsx';
 import {Link, hashHistory} from 'react-router';
 import Alert from 'react-s-alert';
 import cookie from "react-cookies";
+import PropTypes from 'prop-types';
+import {withStyles} from '@material-ui/core/styles';
+import SwipeableViews from 'react-swipeable-views';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
+import BrowseArticles from "./browse_articles.jsx";
+
+const styles = theme => ({
+  root: {
+    width: '100%',
+    flexGrow: 1,
+    backgroundColor: theme.palette.background.paper,
+  },
+  tabsRoot: {
+    borderBottom: '1px solid #e8e8e8',
+  },
+  tabsIndicator: {
+    backgroundColor: '#ff0066',
+  },
+  tabRoot: {
+    textTransform: 'initial',
+    minWidth: 72,
+    fontSize:15,
+    marginRight:10,
+    fontWeight: theme.typography.fontWeightRegular,
+    fontFamily: [
+      '-apple-system',
+      'BlinkMacSystemFont',
+      '"Segoe UI"',
+      'Roboto',
+      '"Helvetica Neue"',
+      'Arial',
+      'sans-serif',
+      '"Apple Color Emoji"',
+      '"Segoe UI Emoji"',
+      '"Segoe UI Symbol"',
+    ].join(','),
+    '&:hover': {
+      color: '#ff0066',
+      opacity: 1,
+    },
+    '&$tabSelected': {
+      color: '#ff0066',
+      fontWeight: theme.typography.fontWeightMedium,
+    },
+    '&:focus': {
+      color: '#ff0066',
+    },
+  },
+
+  tabSelected: {},
+  typography: {
+    padding: theme.spacing.unit * 3,
+  },
+});
+
 
 class BrowseTopics extends React.Component {
   constructor(props) {
     super(props);
     this.handleLogout = this.handleLogout.bind(this);
-    this.state = {topics: [], loading: true};
+    this.state = {loading: false, value:0, selectedTopic:{}};
   }
 
-  componentDidMount() {
-    var myHeaders = new Headers({
-      "Content-Type": "application/x-www-form-urlencoded",
-      "x-access-token": window.localStorage.getItem('userToken')
-    });
-    var myInit = {
-      method: 'GET',
-      headers: myHeaders,
-    };
-    var that = this;
-    fetch('/api/topics', myInit)
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (response) {
-        if (response.error.error)
-          Alert.error(response.error.message);
-        else {
-          console.log("topics " + JSON.stringify(response.data))
-          that.setState({topics: response.data})
-        }
-        that.setState({loading: false});
-      });
+  handleChange(event, value) {
+    this.setState({selectedTopic:this.props.topics[value], value:value})
   }
-
-//t = current time
-//b = start value
-//c = change in value
-//d = duration
 
   handleLogout() {
     cookie.remove('google_email')
@@ -60,14 +92,16 @@ class BrowseTopics extends React.Component {
   }
 
   render() {
+    const { classes, topics } = this.props;
+    const { value } = this.state;
     if (this.state.loading)
       return <Loader/>;
-    if (this.state.topics.length < 1) {
+    if (topics.length < 1) {
       return <p className="help-block center-align">There are no topics created yet</p>;
     }
     else {
       return (
-        <nav className="navbar container-fluid navbar-default">
+        <div>
 
           <div className="navbar-header">
 
@@ -85,7 +119,7 @@ class BrowseTopics extends React.Component {
 
           <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul className="nav navbar-nav navbar-right">
-              {cookie.load('google_email') === 'rj12info@gmail.com'&&
+              {cookie.load('google_email') === 'rj12info@gmail.com' &&
               <li><Link to="admin" className="">Admin
               </Link>
               </li>
@@ -93,24 +127,32 @@ class BrowseTopics extends React.Component {
               <li className="lead"><Link to="article/new" className="">New Article
               </Link>
               </li>
-            </ul>
-            <ul className="nav navbar-nav navbar-left">
-              {this.state.topics.map(topic => (
-                <li data-toggle="tooltip" data-placement="bottom" title={topic.description}><Link
-                  to={"topic/" + topic.id} className=""><a href="#" className="list-group-item dropdown-toggle">
-                  <h4 className="list-group-item-heading">{topic.name}</h4></a></Link>
-                </li>
-              ))}
               <li>
                 <a href="" onClick={this.handleLogout}>Logout</a>
               </li>
             </ul>
-            <hr className="article-separator"></hr>
           </div>
+          <AppBar position="static" color="default">
+            <Tabs
+              value={this.state.value}
+              onChange={this.handleChange.bind(this)}
+              indicatorColor="primary"
+              textColor="primary"
+              variant="scrollable"
+              scrollButtons="on"
+              classes={{ root: classes.tabsRoot, indicator: classes.tabsIndicator }}>
+              {topics.map(topic => (
+                <Tab label={topic.name} classes={{ root: classes.tabRoot, selected: classes.tabSelected }}/>
 
-        </nav>);
+              ))}
+            </Tabs>
+          </AppBar>
+          <BrowseArticles topic={this.state.selectedTopic} index={value}/>
+        </div>
+
+      );
     }
   }
 }
 
-export default BrowseTopics;
+export default withStyles(styles)(BrowseTopics);

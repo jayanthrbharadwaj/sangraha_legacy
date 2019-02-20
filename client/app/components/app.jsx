@@ -38,7 +38,7 @@ class App extends React.Component {
         if(response.error.error)
           Alert.error(response.error.message);
         else {
-          that.setState({topics: response.data})
+          that.setState({loading: false, topics: response.data})
         }
         that.setState({loading: false});
       });
@@ -51,7 +51,7 @@ class App extends React.Component {
     else {
       return (
         <div>
-          {!this.state.isLogin && <BrowseTopics/>}
+          {!this.state.isLogin && <BrowseTopics topics = {this.state.topics}/>}
           <div className="content container">
             {that.props.children}
           </div>

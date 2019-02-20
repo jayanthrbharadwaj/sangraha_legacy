@@ -19,7 +19,7 @@ class BrowseArticles extends React.Component {
                headers: myHeaders,
                };
     var that = this;
-    var url = '/api/articles';
+    var url = '/api/topic/'+this.props.topic['id']+'/articles';
     fetch(url,myInit)
     .then(function(response) {
       return response.json();
@@ -44,11 +44,7 @@ class BrowseArticles extends React.Component {
                headers: myHeaders,
                };
     var that = this;
-    var url = '/api/articles';
-    if(nextProps.params.topicId==null && this.props.params.topicId==null)
-      var url = '/api/articles';
-    else
-      var url = '/api/topic/'+nextProps.params.topicId+'/articles';
+    var url = '/api/topic/'+nextProps.topic['id']+'/articles';
     fetch(url,myInit)
     .then(function(response) {
       return response.json();
@@ -66,7 +62,7 @@ class BrowseArticles extends React.Component {
 
   render () {
     return(
-    <div className="article-list" id = {"topic/"+this.props.params.topicId}>
+    <div className="article-list">
       {this.state.loading && <Loader/>}
       {this.state.articles.length<1 &&  <p className="help-block center-align">There are no articles under this topic</p>}
 
