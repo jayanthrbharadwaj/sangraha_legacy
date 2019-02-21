@@ -13,6 +13,7 @@ var Articles = require('../models/article.js');
 var Topics = require('../models/topic.js');
 var Archives = require('../models/archive.js');
 var Users = require('../models/user.js');
+var Utils = require('../api/utils/genericutils');
 
 var db = require('../db.js'); //this file contains the knex file import. it's equal to knex=require('knex')
 
@@ -31,6 +32,8 @@ module.exports = function (app) {
       body: req.body.body,
       topic_id: req.body.topic_id,
       user_id: req.body.user_id,
+      created_at:Utils.js_yyyy_mm_dd_hh_mm_ss(),
+      updated_at:Utils.js_yyyy_mm_dd_hh_mm_ss(),
       what_changed: "Another drop in the ocean of knowledge"
     }).then(function (article) {
       res.json({
@@ -105,6 +108,7 @@ module.exports = function (app) {
           title: req.body.title,
           body: req.body.body,
           topic_id: req.body.topic_id,
+          updated_at:Utils.js_yyyy_mm_dd_hh_mm_ss(),
           what_changed: req.body.what_changed,
           user_id: req.body.user_id
         })
