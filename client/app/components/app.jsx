@@ -23,10 +23,6 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    if (window.location.href.indexOf("article") > 0) {
-      this.setState({loading: false});
-      return
-    }
     var myHeaders = new Headers({
       "Content-Type": "application/x-www-form-urlencoded",
       "x-access-token": window.localStorage.getItem('userToken')
@@ -45,9 +41,10 @@ class App extends React.Component {
           Alert.error(response.error.message);
         else {
           that.setState({loading: false, topics: response.data})
-          if (that.state.isLoggedin && window.location.href) {
+          if (window.location.href.indexOf("article") > 0) {
+            this.setState({loading: false});
+          } else {
             hashHistory.push("/topic/0")
-            return
           }
         }
         that.setState({loading: false});
