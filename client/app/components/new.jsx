@@ -111,6 +111,16 @@ class NewArticle extends React.Component {
     }
   }
 
+  componentWillMount() {
+    if (cookie.load('google_email') === undefined) {
+      this.setState({isLoggedin: false})
+      hashHistory.push('login');
+    } else {
+      this.setState({isLoggedin: true})
+
+    }
+  }
+
   componentDidMount() {
     var myHeaders = new Headers({
       "Content-Type": "application/x-www-form-urlencoded",
@@ -159,6 +169,7 @@ class NewArticle extends React.Component {
           if (response.error.error)
             Alert.error(response.error.message);
           else {
+            that.makeSaveAPICall(response.data.id)
             hashHistory.push('article/edit/' + response.data.id + '?new=true');
           }
         });
@@ -167,6 +178,28 @@ class NewArticle extends React.Component {
       Alert.error("Article Body, Title and Topic Information is required.");
     }
     this.setState({getApprovalUI: true})
+  }
+
+  makeSaveAPICall(articleId) {
+    var myHeaders = new Headers({
+      "Content-Type": "application/x-www-form-urlencoded",
+      "x-access-token": window.localStorage.getItem('userToken')
+    });
+    var myInit = {
+      method: 'POST',
+      headers: myHeaders,
+      body: "&user_id=" + cookie.load("user_id") + "&article_id=" + articleId + "&author_name=" + cookie.load('google_name') + "&author_email=" + cookie.load('google_email')
+    };
+    fetch('/api/approvals/save', myInit)
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (response) {
+        if (response.error.error)
+          Alert.error(response.error.message);
+        else {
+        }
+      });
   }
 
   handleKannadaClick() {
@@ -204,7 +237,7 @@ class NewArticle extends React.Component {
           </div>
           <br/>
           <div className="row">
-            <h5 className="col-md-8 text-left color-text" onClick={this.handleKannadaClick}><b>ಕನ್ನಡ ದಲ್ಲಿ ಬರೆಯಿತಿ</b></h5>
+            <h5 className="col-md-8 text-left color-text" onClick={this.handleKannadaClick.bind(this)}><b>ಕನ್ನಡ ದಲ್ಲಿ ಬರೆಯಿತಿ</b></h5>
             <div className="col-md-12 new-article-form">
               <ReactQuill value={this.state.body}
                           theme="snow"

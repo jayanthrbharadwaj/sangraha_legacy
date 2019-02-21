@@ -1,5 +1,4 @@
 import React from 'react';
-import BrowseArticles from './browse_articles.jsx';
 import {hashHistory} from 'react-router';
 import Loader from './loader.jsx';
 
@@ -20,10 +19,6 @@ class Home extends React.Component {
   render () {
     if(this.state.loading)
       return <Loader/>;
-    else
-    return(<div>
-          <BrowseArticles topicId={this.state.topicId} />
-    </div>);
   }
 }
 

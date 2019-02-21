@@ -69,6 +69,7 @@ module.exports = function (app) {
   });
 
 
+  // Get to know the approval status if user is loggedin
   app.get('/approvals', function (req, res) {
     /*
     This is a GET endpoint that responds with the list of all the articles in the articles table
@@ -101,6 +102,7 @@ module.exports = function (app) {
   })
 
 
+  // Request by approver to place article under approved status
   app.put('/approvals/approved', function (req, res) {
     /*
     This is a PUT endpoint for updating an article information.
@@ -257,6 +259,7 @@ module.exports = function (app) {
   }
 
 
+  // Request to approver is sent in this request
   app.put('/approvals', function (req, res) {
     /*
     This is a PUT endpoint for updating an article information.
@@ -274,7 +277,7 @@ module.exports = function (app) {
           author_email: req.body.author_email,
           author_name: req.body.author_name,
           article_id: req.body.article_id,
-          approver_id: req.body.approver_id,
+          approver_id: req.body.author_email+"_"+req.body.article_id+"_"+req.body.approver_email,
           approver_email: req.body.approver_email,
           approver_name: req.body.approver_name,
           author_url_hash: authorHash,
@@ -337,68 +340,30 @@ module.exports = function (app) {
     */
     var hash = crypto.createHash('md5').update(req.body.author_email+req.body.article_id).digest('hex');
     // TODO fix with req.body.user_id rather than req.body.author_email
-    Approvals.where('author_email', req.body.author_email).fetch().then(function (approval) {
-      if (approval == null) {
-        Approvals.forge().save({
-          author_id: req.body.user_id,
-          author_email: req.body.author_email,
-          author_name: req.body.author_name,
-          article_id: req.body.article_id,
-          approver_id: req.body.approver_id,
-          approver_email: req.body.approver_email,
-          approver_name: req.body.approver_name,
-          author_url_hash: hash
-        }).then(function (saved) {
-          sendEmailToAuthorOnArticleSave(saved)
-          res.json({
-            error: {
-              error: false,
-              message: ''
-            },
-            code: 'B107',
-            data: saved
-          });
-        })
-      } else {
-        approval
-          .save({
-            "author_url_hash": hash
-          })
-          .then(function (saved) {
-            sendEmailToAuthorOnArticleSave(saved)
-            res.json({
-              error: {
-                error: false,
-                message: ''
-              },
-              code: 'B107',
-              data: saved
-            });
-          })
-      }
-    })
-      .catch(function (error) {
-        res.status(500).json({
-          error: {
-            error: true,
-            message: error.message
-          },
-          code: 'B108',
-          data: {}
-        });
-      });
+    var saved={}
+    saved.author_email = req.body.author_email
+    saved.author_name = req.body.author_name
+    saved.article_id = req.body.article_id
+    saved.author_hash_url = hash
+    sendEmailToAuthorOnArticleSave(saved)
 
     function sendEmailToAuthorOnArticleSave(saved) {
+      var mailOptions = {
+        from: 'rj12info@gmail.com',
+        to: 'jayforum87@gmail.com',
+        subject: 'Sending Email using Node.js',
+        html: 'Madhwa Sangraha Wiki. View your article!'
+      };
       //TODO send email to correct recipients
-      mailOptions.subject = "Your just saved a new article"
-      mailOptions.to = [saved.attributes.author_email]
+      mailOptions.subject = "You just saved an article on Sangraha"
+      mailOptions.to = [saved.author_email]
       var jsonPath = path.join(__dirname, '..', 'mailers', 'savearticle.html');
       fs.readFile(jsonPath, 'utf8', function (err, html) {
         if (err) {
           console.log(err);
         } else {
-          html = html.replace("[[${recipient}]]", saved.attributes.author_name)
-          html = html.replace("[[${articleUrl}]]", "http://sangraha.herokuapp.com/#/article/"+saved.attributes.article_id+"?author=" + saved.attributes.author_hash_url)
+          html = html.replace("[[${recipient}]]", saved.author_name)
+          html = html.replace("[[${articleUrl}]]", "http://sangraha.herokuapp.com/#/article/"+saved.article_id+"?author=" + saved.author_hash_url)
           mailOptions.html = html
           transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
@@ -467,91 +432,5 @@ module.exports = function (app) {
         });
       });
   });
-
-
-  app.get('/articles/:id/', function (req, res) {
-    /*
-    This is a GET endpoint that responds with one article of the specific ID (identified through the ID param)
-    the article is present in the data object in the returning object.
-    the error key in the returning object is a boolen which is false if there is no error and true otherwise
-    */
-    Articles.forge({id: req.params.tokem})
-      .fetch()
-      .then(function (article) {
-        Topics.forge({id: article.attributes.topic_id}).fetch().then(function (topic) {
-          articleObj = article.toJSON();
-          topicObj = topic.toJSON();
-          articleObj.topic = topicObj;
-        }).then(function () {
-          Users.forge({id: articleObj.user_id}).fetch().then(function (user) {
-            userObj = user.toJSON();
-            articleObj.user = {
-              id: userObj.id,
-              name: userObj.name,
-              email: userObj.email,
-              about: userObj.about
-            };
-          })
-            .then(function () {
-              res.json({
-                error: {
-                  error: false,
-                  message: ''
-                },
-                code: 'B113',
-                data: articleObj
-              });
-            })
-        })
-      })
-      .catch(function (error) {
-        res.status(500).json({
-          error: {
-            error: true,
-            message: error.message
-          },
-          code: 'B114',
-          data: {}
-        });
-      });
-  });
-
-
-  app.get('/articles/:id/history', function (req, res) {
-    /*
-    This is a GET endpoint that responds with previous versions of the
-    article of the specific ID (identified through the ID param).
-    The article is present in the data object in the returning object.
-    The error key in the returning object is a boolen which is false if there is no error and true otherwise
-    */
-
-    Articles.where({id: req.params.id}).fetch({
-      withRelated: [{
-        'archives': function (qb) {
-          qb.orderBy("updated_at", "DESC");
-        }
-      }]
-    }).then(function (article) {
-      res.status(200).json({
-        error: {
-          error: false,
-          message: ''
-        },
-        code: 'B115',
-        data: article.related('archives')
-      });
-    })
-      .catch(function (error) {
-        res.status(500).json({
-          error: {
-            error: true,
-            message: error.message
-          },
-          code: 'B116',
-          data: {}
-        });
-      });
-  });
-
 
 }

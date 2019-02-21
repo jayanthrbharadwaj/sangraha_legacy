@@ -255,7 +255,7 @@ class EditArticle extends React.Component {
                 else {
                   Alert.success("Article saved. Sent an email for your reference");
                 }
-                that.setState({loading: false, getApprovalUI: false, requestForApprovalSent: true, authorUrlHash:"http://localhost:5000/#/article/"+response.data.article_id+"?author="+ response.data.approver_url_hash});
+                that.setState({loading: false, getApprovalUI: false, requestForApprovalSent: true, authorUrlHash:window.location.origin+"/#/article/"+response.data.article_id+"?author="+ response.data.approver_url_hash});
               });
           }
         });
@@ -303,7 +303,7 @@ class EditArticle extends React.Component {
           </div>
           <br/>
           <div className="row">
-            <h5 className="col-md-8 text-left color-text" onClick={this.handleKannadaClick}><b>ಕನ್ನಡ ದಲ್ಲಿ ಬರೆಯಿತಿ</b></h5>
+            <h5 className="col-md-8 text-left color-text" onClick={this.handleKannadaClick.bind(this)}><b>ಕನ್ನಡ ದಲ್ಲಿ ಬರೆಯಿತಿ</b></h5>
             <div className="col-md-12 new-article-form">
               <ReactQuill value={this.state.body}
                           theme="snow"

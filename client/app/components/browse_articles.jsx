@@ -19,7 +19,7 @@ class BrowseArticles extends React.Component {
                headers: myHeaders,
                };
     var that = this;
-    var url = '/api/topic/'+this.props.topic['id']+'/articles';
+    var url = '/api/topic/'+this.props.params.topicId+'/articles';
     fetch(url,myInit)
     .then(function(response) {
       return response.json();
@@ -35,7 +35,9 @@ class BrowseArticles extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({loading: true});
+    if(nextProps.params.topicId == this.props.params.topicId) {
+      return
+    }
     var myHeaders = new Headers({
         "Content-Type": "application/x-www-form-urlencoded",
         "x-access-token": window.localStorage.getItem('userToken')
@@ -44,7 +46,7 @@ class BrowseArticles extends React.Component {
                headers: myHeaders,
                };
     var that = this;
-    var url = '/api/topic/'+nextProps.topic['id']+'/articles';
+    var url = '/api/topic/'+nextProps.params.topicId+'/articles';
     fetch(url,myInit)
     .then(function(response) {
       return response.json();

@@ -9,49 +9,59 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { topics: [], loading: true, isLogin: false};
+    this.state = {topics: [], loading: true, isLoggedin: false};
   }
 
   componentWillMount() {
-    if(cookie.load('google_email')=== undefined) {
-      this.setState({isLogin:true})
+    if (cookie.load('google_email') === undefined) {
+      this.setState({isLoggedin: false})
       hashHistory.push('login');
     } else {
-      this.setState({isLogin:false})
+      this.setState({isLoggedin: true})
+
     }
   }
 
   componentDidMount() {
+    if (window.location.href.indexOf("article") > 0) {
+      this.setState({loading: false});
+      return
+    }
     var myHeaders = new Headers({
       "Content-Type": "application/x-www-form-urlencoded",
       "x-access-token": window.localStorage.getItem('userToken')
     });
-    var myInit = { method: 'GET',
+    var myInit = {
+      method: 'GET',
       headers: myHeaders,
     };
     var that = this;
-    fetch('/api/topics',myInit)
-      .then(function(response) {
+    fetch('/api/topics', myInit)
+      .then(function (response) {
         return response.json();
       })
-      .then(function(response) {
-        if(response.error.error)
+      .then(function (response) {
+        if (response.error.error)
           Alert.error(response.error.message);
         else {
           that.setState({loading: false, topics: response.data})
+          if (that.state.isLoggedin && window.location.href) {
+            hashHistory.push("/topic/0")
+            return
+          }
         }
         that.setState({loading: false});
       });
   }
 
-  render () {
+  render() {
     var that = this;
     if (this.state.loading)
       return <Loader/>;
     else {
       return (
         <div>
-          {!this.state.isLogin && <BrowseTopics topics = {this.state.topics}/>}
+          {<BrowseTopics topics={this.state.topics}/>}
           <div className="content container">
             {that.props.children}
           </div>

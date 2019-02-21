@@ -1,16 +1,12 @@
 import React from 'react';
 import Loader from './loader.jsx';
-import {Link, hashHistory} from 'react-router';
+import {hashHistory, Link} from 'react-router';
 import Alert from 'react-s-alert';
 import cookie from "react-cookies";
-import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
-import SwipeableViews from 'react-swipeable-views';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
-import BrowseArticles from "./browse_articles.jsx";
 
 const styles = theme => ({
   root: {
@@ -71,6 +67,7 @@ class BrowseTopics extends React.Component {
 
   handleChange(event, value) {
     this.setState({selectedTopic:this.props.topics[value], value:value})
+    hashHistory.push("/topic/"+ value)
   }
 
   handleLogout() {
@@ -147,7 +144,6 @@ class BrowseTopics extends React.Component {
               ))}
             </Tabs>
           </AppBar>
-          <BrowseArticles topic={this.state.selectedTopic} index={value}/>
         </div>
 
       );

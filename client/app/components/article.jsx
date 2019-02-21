@@ -273,7 +273,7 @@ class ViewArticle extends React.Component {
                   <Typography variant="headline" className={classes.title} color="textSecondary">
                     {this.state.article.title}
                   </Typography>
-                  <Typography variant="headline" component="p">
+                  <Typography variant="h6" component="p" color="textSecondary">
                     Last updated on {new Date(this.state.article.updated_at.replace(' ','T')).toDateString()}
                   </Typography>
                   <Typography className={classes.pos} color="textSecondary"
