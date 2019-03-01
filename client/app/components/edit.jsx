@@ -52,10 +52,12 @@ class EditArticle extends React.Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
+    this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleSave = this.handleSave.bind(this);
     this.state = {
       body: "", title: "", topic_id: "", topics: [], loading: true, getApprovalUI: true, authorUrlHash:"",
-      requestForApprovalSent: false
+      requestForApprovalSent: false,
+      isSaved:false
     };
 
     this.modules = {
@@ -109,6 +111,10 @@ class EditArticle extends React.Component {
     this.setState({body: html});
   }
 
+  handleTitleChange(html) {
+    this.setState({title: html.target.value});
+  }
+
   componentDidUpdate() {
     if (this.props.location.query.new) {
       $('#myModal').modal('show');
@@ -118,7 +124,7 @@ class EditArticle extends React.Component {
   handleSave(e) {
     e.preventDefault();
     var body = this.state.body;
-    var title = this.refs.title.value;
+    var title = this.state.title;
     var topicId = this.refs.topic.value;
     var what_changed = this.refs.what_changed.value;
     if (body && title && topicId && what_changed) {
@@ -129,7 +135,7 @@ class EditArticle extends React.Component {
       var myInit = {
         method: 'PUT',
         headers: myHeaders,
-        body: "id=" + this.props.params.articleId + "&title=" + encodeURIComponent(title) + "&body=" + encodeURIComponent(body) + "&topic_id=" + topicId + "&user_id=" + window.localStorage.getItem("userId") + "&what_changed=" + what_changed
+        body: "id=" + this.props.params.articleId + "&title=" + encodeURIComponent(title) + "&body=" + encodeURIComponent(body) + "&topic_id=" + topicId + "&user_id=" + cookie.load("user_id") + "&what_changed=" + what_changed
       };
       var that = this;
       fetch('/api/articles/', myInit)
@@ -140,6 +146,8 @@ class EditArticle extends React.Component {
           if (response.error.error)
             Alert.error(response.error.message);
           else {
+            that.setState({isSaved:true})
+            Alert.error("Article Saved Successfully");
             hashHistory.push('article/edit/' + response.data.id);
           }
         });
@@ -293,11 +301,21 @@ class EditArticle extends React.Component {
         <div className="new-article">
           <div className="row">
             <div className="col-md-12">
-              <input
-                onChange={this.handleChange}
-                ref="title"
-                className="form-control input-title"
+              <TextField
+                id="standard-name"
+                placeholder="Article Title"
+                helperText="ನಿಮ್ಮ ಲೇಖನ 3-4 ಶಬ್ಧದಲ್ಲಿ"
+                label="Article title"
+                fullWidth
                 value={this.state.title}
+                onChange={this.handleTitleChange.bind(this)}
+                margin="normal"
+                InputLabelProps={{
+                  className: classes.textLabelField,
+                }}
+                InputProps={{
+                  className: classes.textField,
+                }}
               />
             </div>
           </div>
@@ -330,7 +348,7 @@ class EditArticle extends React.Component {
               </div>
               <br/>
             </div>
-
+            {this.state.isSaved && <h5 className="col-md-8 text-left color-text" ><b>Article Unpublished. Please get an approval for your edits</b></h5>}
             {this.state.getApprovalUI && <div><TextField
               id="standard-name"
               placeholder="ನಿಮ್ಮ ಆಧ್ಯಾತ್ಮ ಗುರುಗಳಿಂದ ಸಹಿ ಪಡೆಯಿರಿ"
@@ -366,6 +384,7 @@ class EditArticle extends React.Component {
                 }}
               />
             </div>}
+
             {this.state.requestForApprovalSent &&
             <div className="row">
               <div className="col-md-12">

@@ -42,7 +42,7 @@ class App extends React.Component {
         else {
           that.setState({loading: false, topics: response.data})
           if (window.location.href.indexOf("article") > 0) {
-            this.setState({loading: false});
+            that.setState({loading: false});
           } else {
             hashHistory.push("/topic/0")
           }

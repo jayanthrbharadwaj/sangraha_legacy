@@ -20,7 +20,7 @@ const styles = theme => ({
     transform: 'scale(0.8)',
   },
   title: {
-    marginBottom: 16,
+    marginBottom: 4,
     fontSize: 24,
   },
   pos: {
@@ -86,7 +86,7 @@ class ViewArticle extends React.Component {
 
     this.disqusShortname = 'https-sangraha-herokuapp-com';
     this.disqusConfig = {
-      url: window.location.href,
+      url: "http://example.com",
       identifier: this.props.params.articleId,
       title: this.state.article.title,
     };
@@ -270,14 +270,14 @@ class ViewArticle extends React.Component {
             <div className="col-md-9">
               <Card className={classes.card}>
                 <CardContent>
-                  <Typography variant="headline" className={classes.title} color="textSecondary">
+                  <u><Typography variant="headline" className={classes.title} color="textSecondary">
                     {this.state.article.title}
+                  </Typography></u>
+                  <Typography className={classes.pos} color="textSecondary"
+                              dangerouslySetInnerHTML={this.getRawMarkupBody()}>
                   </Typography>
                   <Typography variant="h6" component="p" color="textSecondary">
                     Last updated on {new Date(this.state.article.updated_at.replace(' ','T')).toDateString()}
-                  </Typography>
-                  <Typography className={classes.pos} color="textSecondary"
-                              dangerouslySetInnerHTML={this.getRawMarkupBody()}>
                   </Typography>
                 </CardContent>
                 <CardActions>
