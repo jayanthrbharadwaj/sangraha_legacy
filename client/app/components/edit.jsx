@@ -9,8 +9,9 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import {withStyles} from '@material-ui/core/styles';
-import ReactQuill,{ Quill }  from 'react-quill'; // ES6
-import { ImageUpload }  from '@rj12info/quillimageupload';
+import ReactQuill, {Quill} from 'react-quill'; // ES6
+import {ImageUpload} from '@rj12info/quillimageupload';
+
 Quill.register('modules/imageUpload', ImageUpload);
 
 import Loader from './loader.jsx';
@@ -22,6 +23,8 @@ const styles = theme => ({
     flexWrap: 'wrap',
   },
   textField: {
+    marginLeft: theme.spacing.unit,
+    marginRight: theme.spacing.unit,
     fontSize: 30,
     lineHeight: 2.4
   },
@@ -55,9 +58,9 @@ class EditArticle extends React.Component {
     this.handleTitleChange = this.handleTitleChange.bind(this);
     this.handleSave = this.handleSave.bind(this);
     this.state = {
-      body: "", title: "", topic_id: "", topics: [], loading: true, getApprovalUI: true, authorUrlHash:"",
+      body: "", title: "", topic_id: "", topics: [], loading: true, getApprovalUI: true, authorUrlHash: "",
       requestForApprovalSent: false,
-      isSaved:false
+      isSaved: false
     };
 
     this.modules = {
@@ -84,7 +87,8 @@ class EditArticle extends React.Component {
           next(file); // go back to component and send to the server
         }
       },
-      toolbar: {container:[
+      toolbar: {
+        container: [
           [{'header': '1'}, {'header': '2'}, {'font': []}],
           [{size: []}],
           ['bold', 'italic', 'underline', 'strike', 'blockquote'],
@@ -92,7 +96,8 @@ class EditArticle extends React.Component {
             {'indent': '-1'}, {'indent': '+1'}],
           ['link', 'image', 'video'],
           ['clean'],
-        ]},
+        ]
+      },
       clipboard: {
         // toggle to add extra line breaks when pasting HTML:
         matchVisual: false,
@@ -146,7 +151,7 @@ class EditArticle extends React.Component {
           if (response.error.error)
             Alert.error(response.error.message);
           else {
-            that.setState({isSaved:true})
+            that.setState({isSaved: true})
             Alert.error("Article Saved Successfully");
             hashHistory.push('article/edit/' + response.data.id);
           }
@@ -158,7 +163,7 @@ class EditArticle extends React.Component {
   }
 
   componentWillMount() {
-    if(cookie.load('google_email') === undefined) {
+    if (cookie.load('google_email') === undefined) {
       hashHistory.push('login');
     }
   }
@@ -263,7 +268,12 @@ class EditArticle extends React.Component {
                 else {
                   Alert.success("Article saved. Sent an email for your reference");
                 }
-                that.setState({loading: false, getApprovalUI: false, requestForApprovalSent: true, authorUrlHash:window.location.origin+"/#/article/"+response.data.article_id+"?author="+ response.data.approver_url_hash});
+                that.setState({
+                  loading: false,
+                  getApprovalUI: false,
+                  requestForApprovalSent: true,
+                  authorUrlHash: window.location.origin + "/#/article/" + response.data.article_id + "?author=" + response.data.approver_url_hash
+                });
               });
           }
         });
@@ -321,7 +331,8 @@ class EditArticle extends React.Component {
           </div>
           <br/>
           <div className="row">
-            <h5 className="col-md-8 text-left color-text" onClick={this.handleKannadaClick.bind(this)}><b>ಕನ್ನಡ ದಲ್ಲಿ ಬರೆಯಿತಿ</b></h5>
+            <h5 className="col-md-8 text-left color-text" onClick={this.handleKannadaClick.bind(this)}><b>ಕನ್ನಡ ದಲ್ಲಿ
+              ಬರೆಯಿತಿ</b></h5>
             <div className="col-md-12 new-article-form">
               <ReactQuill value={this.state.body}
                           theme="snow"
@@ -348,42 +359,59 @@ class EditArticle extends React.Component {
               </div>
               <br/>
             </div>
-            {this.state.isSaved && <h5 className="col-md-8 text-left color-text" ><b>Article Unpublished. Please get an approval for your edits</b></h5>}
-            {this.state.getApprovalUI && <div><TextField
-              id="standard-name"
-              placeholder="ನಿಮ್ಮ ಆಧ್ಯಾತ್ಮ ಗುರುಗಳಿಂದ ಸಹಿ ಪಡೆಯಿರಿ"
-              helperText="Please don't misuse this feature!"
-              label="Name of your approver in English"
-              fullWidth
-              errorText={this.state.nameFormatError}
-              value={this.state.name}
-              onChange={this.handleNameChange.bind(this)}
-              margin="normal"
-              InputLabelProps={{
-                className: classes.textLabelField,
-              }}
-              InputProps={{
-                className: classes.textField,
-              }}
-            />
-              <TextField
-                id="standard-name"
-                placeholder="Please enter valid Email Id"
-                helperText="ನಿಮ್ಮ ಲೇಖನ ಓದಿದ ನಂತರ ಇವರು ಸಹಿ/ approve ಮಾಡುತ್ತಾರೆ"
-                label="Email Id of the approver"
-                fullWidth
-                errorText={this.state.emailFormatError}
-                value={this.state.name}
-                onChange={this.handleEmailChange.bind(this)}
-                margin="normal"
-                InputLabelProps={{
-                  className: classes.textLabelField,
-                }}
-                InputProps={{
-                  className: classes.textField,
-                }}
-              />
-            </div>}
+            <div className="col-md-12">
+              <button className="btn btn-default btn-block btn-lg" onClick={this.handleSave}>Save Article</button>
+            </div>
+            {this.state.isSaved &&
+            <h5 className="col-md-8 text-left color-text"><b>Article Unpublished. Please get an approval for your
+              edits</b></h5>}
+            <table>
+              <tr>
+                <td>
+                  {this.state.getApprovalUI && <TextField
+                    id="standard-name"
+                    placeholder="ನಿಮ್ಮ ಆಧ್ಯಾತ್ಮ ಗುರುಗಳಿಂದ ಸಹಿ ಪಡೆಯಿರಿ"
+                    helperText="Please don't misuse this feature!"
+                    label="Name of your approver in English"
+                    fullWidth
+                    errorText={this.state.nameFormatError}
+                    value={this.state.name}
+                    onChange={this.handleNameChange.bind(this)}
+                    margin="normal"
+                    InputLabelProps={{
+                      className: classes.textLabelField,
+                    }}
+                    InputProps={{
+                      className: classes.textField,
+                    }}
+                  />}
+                </td>
+                <td>
+                  {this.state.getApprovalUI && <TextField
+                    id="standard-name"
+                    placeholder="Please enter valid Email Id"
+                    helperText="ನಿಮ್ಮ ಲೇಖನ ಓದಿದ ನಂತರ ಇವರು ಸಹಿ/ approve ಮಾಡುತ್ತಾರೆ"
+                    label="Email Id of the approver"
+                    fullWidth
+                    errorText={this.state.emailFormatError}
+                    value={this.state.name}
+                    onChange={this.handleEmailChange.bind(this)}
+                    margin="normal"
+                    InputLabelProps={{
+                      className: classes.textLabelField,
+                    }}
+                    InputProps={{
+                      className: classes.textField,
+                    }}
+                  />
+
+                  }
+                </td>
+
+
+              </tr>
+            </table>
+
 
             {this.state.requestForApprovalSent &&
             <div className="row">
@@ -403,9 +431,6 @@ class EditArticle extends React.Component {
             }
 
             <div className="row">
-              <div className="col-md-12">
-                <button className="btn btn-default btn-block btn-lg" onClick={this.handleSave}>Save Article</button>
-              </div>
               {this.state.getApprovalUI && <div className="col-md-12"><br/>
                 <br/>
                 <button className="btn btn-default btn-block btn-lg" onClick={this.handleGetApproval.bind(this)}>Get
@@ -460,16 +485,20 @@ class EditArticle extends React.Component {
                       <div className="col-md-6 col-sd-12">
                         <h1><b>Yayyyy!</b></h1>
                         <h2>ಕನ್ನಡ ದಲ್ಲಿ ಬರೆಯಿರಿ</h2>
-                        <h5 onClick={this.handleTransliterateRefresh.bind(this)}>type english + spacebar ಇಂಗ್ಲೀಷ್ not showing? <u>Refresh browser</u></h5>
+                        <h5 onClick={this.handleTransliterateRefresh.bind(this)}>type english + spacebar ಇಂಗ್ಲೀಷ್ not
+                          showing? <u>Refresh browser</u></h5>
                       </div>
                       <div className="center-block">
-                        <textarea ref="transliterateTextareaEdit" onChange={this.handleTransliterate.bind(this)} id="transliterateTextareaEdit" style={{width:'1000px',height:'300px'}}></textarea>
+                        <textarea ref="transliterateTextareaEdit" onChange={this.handleTransliterate.bind(this)}
+                                  id="transliterateTextareaEdit" style={{width: '1000px', height: '300px'}}></textarea>
                       </div>
                       <br/>
                       <br/>
                       <br/>
                       <div className="col-md-6">
-                        <button type="button" className="btn btn-default btn-block btn-lg" data-dismiss="modal">Continue formatting</button>
+                        <button type="button" className="btn btn-default btn-block btn-lg" data-dismiss="modal">Continue
+                          formatting
+                        </button>
                       </div>
                     </div>
                   </center>
