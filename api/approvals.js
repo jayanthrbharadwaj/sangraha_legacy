@@ -165,7 +165,7 @@ module.exports = function (app) {
       service: 'gmail',
       auth: {
         user: 'rj12info@gmail.com',
-        pass: 'bertyui1234'
+        pass: 'jlshffjhddfhdjghdf'
       }
     });
     var mailOptions = {
